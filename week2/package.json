@@ -1,0 +1,17 @@
+{
+  "name": "week2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "watch-server.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Uros Jankovic",
+  "license": "ISC",
+  "dependencies": {
+    "node": "^14.11.0"
+  },
+  "devDependencies": {
+    "mocha": "^8.1.3"
+  }
+}
