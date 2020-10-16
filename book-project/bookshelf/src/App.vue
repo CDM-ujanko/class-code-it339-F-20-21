@@ -1,72 +1,48 @@
 <template>
   <div id="app">
-    <label>Show/hide
-      <input type="checkbox" v-model="showForm">
-    </label>
-    <div v-if="showForm">
-      <input v-model="name" type="text">
-      {{ name }}
+    <div class="books">
+      <book v-for="(book, i) in books" :key="i" :book="book"></book>
     </div>
-
-    <div>
-      {{ name }}'s random items are:
-
-      <ul>
-        <li v-for="(item, i) in randomItems" :key="i">
-          {{ i }}: {{ item }}
-          <button @click="removeFromRandomItems(i)">Remove</button>
-        </li>
-      </ul>
-      <h3> Add more to list</h3>
-      <input v-model="itemToAdd" type="text">
-      <button v-on:click="addToRandomItems">Add</button>
-    </div>
+    <button @click="nextPage">Load More</button>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+import Book from './components/Book'
+
 export default {
   name: 'App',
+  components: {
+    Book,
+  },
   data() {
     return {
-      name: 'Uros',
-      showForm: true,
-      randomItems: ['house', 'cow', 'phone', 42, 'house'],
-      itemToAdd: '',
+      from: 0,
+      size: 10,
+      books: []
     }
   },
 
-  created() {
-    console.log('created!');
-  },
-
   mounted() {
-    console.log('mounted!');
-    setTimeout(() => {
-      this.name = 'Bob';
-    }, 1000)
-  },
-
-  beforeUpdate() {
-    console.log('beforeUpdate!');
-  },
-
-  updated() {
-    console.log('updated!');
+    this.getBooks();
   },
 
   methods: {
-    addToRandomItems(e) {
-      console.log(e)
-      if (!this.itemToAdd) {
-        return;
-      }
-      this.randomItems.push(this.itemToAdd);
-      this.itemToAdd = '';
+    getBooks() {
+      axios.get('http://localhost:4000/api/search/books', {
+        params: {
+          from: this.from,
+          size: this.size
+        }
+      }).then((resp) => {
+        this.books = this.books.concat(resp.data)
+      }).catch(console.error)
     },
 
-    removeFromRandomItems(index) {
-      this.randomItems.splice(index, 1)
+    nextPage() {
+      this.from += this.size;
+      this.getBooks();
     }
   }
 }
@@ -80,5 +56,10 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.books {
+  display: flex;
+  flex-wrap: wrap;
 }
 </style>
