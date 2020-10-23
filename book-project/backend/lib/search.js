@@ -35,4 +35,38 @@ module.exports = (app, es) => {
       searchHandler(searchUrl('books', 'book'), req, resp));
   app.get('/api/search/bundles', (req, resp) =>
       searchHandler(searchUrl('bundles', 'bundle'), req, resp));
+
+  app.get('/api/search/bundles/books', async (req, resp) => {
+      try {
+        let bundleResp = await axios.get(searchUrl('bundles', 'bundle'));
+
+        let ids = [];
+        let bundles = bundleResp.data.hits.hits;
+        bundles.forEach((bundle) => {
+          ids = ids.concat(bundle._source.books);
+        })
+
+        let booksResp = await axios({
+          url: `http://${es.host}:${es.port}/books/book/_search`,
+          method: 'GET',
+          data: {
+            query: {
+              ids: {
+                values: ids
+              }
+            }
+          }
+        })
+
+        let books = booksResp.data.hits.hits;
+        bundles.forEach((bundle) => {
+          bundle.books = books.filter(book => bundle._source.books.includes(book._id))
+        })
+
+        resp.json(bundles);
+
+      } catch (err) {
+        resp.status(500).json(err);
+      }
+  });
 }

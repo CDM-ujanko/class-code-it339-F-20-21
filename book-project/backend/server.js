@@ -35,7 +35,10 @@ app.use(function (req, res, next) {
   next();
 });
 
-const search = require('./lib/search')(app, config.es);
+app.use(express.json());
+
+require('./lib/search')(app, config.es);
+require('./lib/bundle')(app, config.es);
 
 app.get('/api/version', (req, resp) => {
   resp.json({version: pkg.version});
