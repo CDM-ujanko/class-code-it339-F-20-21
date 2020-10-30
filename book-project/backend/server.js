@@ -2,16 +2,16 @@
 
 const express = require('express'),
     pkg = require('./package.json'),
-    axios = require('axios');
+    axios = require('axios'),
+    sqlService = require('./services/SqlService');
 
-// let version = 'description';
-// console.log(pkg[version], pkg.version, pkg);
+require('dotenv').config()
 
 const config = {
-  port: 4000,
+  port: process.env.SERVER_PORT,
   es: {
-    host: 'localhost',
-    port: 9200
+    host: process.env.ES_HOST,
+    port: process.env.ES_PORT
   }
 }
 
