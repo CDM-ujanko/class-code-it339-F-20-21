@@ -3,7 +3,7 @@
 const axios = require('axios'),
     sqlService = require('../services/SqlService');
 
-module.exports = (app, es) => {
+module.exports = (app, es, passport) => {
   const url = `http://${es.host}:${es.port}/bundles/bundle/`
 
   // app.get('/api/bundle/:id', (req, resp) => {
@@ -20,7 +20,7 @@ module.exports = (app, es) => {
   //       })
   // })
 
-  app.put('/api/bundle/:id', (req, resp) => {
+  app.put('/api/bundle/:id', passport.authenticate('jwt', {session: false}), (req, resp) => {
     // TODO: Validation!
     axios({
       url: `${url}${req.params.id}`,
@@ -60,19 +60,19 @@ module.exports = (app, es) => {
   //       })
   // })
 
-  app.get('/api/bundles', (req, resp) => {
+  app.get('/api/bundles', passport.authenticate('jwt', {session: false}), (req, resp) => {
     sqlService.getBundles((err, results, filed) => {
       resp.json(results);
     })
   })
 
-  app.get('/api/bundle/:id', (req, resp) => {
+  app.get('/api/bundle/:id', passport.authenticate('jwt', {session: false}), (req, resp) => {
     sqlService.getBundle(req.params.id, (err, results, filed) => {
       resp.json(results);
     })
   })
 
-  app.post('/api/bundle', (req, resp) => {
+  app.post('/api/bundle', passport.authenticate('jwt', {session: false}), (req, resp) => {
     sqlService.createBundle({
       name: req.body.name,
       description: req.body.description,

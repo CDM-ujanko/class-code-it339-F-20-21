@@ -3,7 +3,8 @@
 const express = require('express'),
     pkg = require('./package.json'),
     axios = require('axios'),
-    sqlService = require('./services/SqlService');
+    SqlService = require('./services/SqlService'),
+    passport = require('passport');
 
 require('dotenv').config()
 
@@ -37,8 +38,32 @@ app.use(function (req, res, next) {
 
 app.use(express.json());
 
+let JwtStrategy = require('passport-jwt').Strategy,
+    ExtractJwt = require('passport-jwt').ExtractJwt;
+
+let opts = {
+  jwtFromRequest: ExtractJwt.fromUrlQueryParameter('token'),
+  secretOrKey: process.env.JWT_SECRET
+};
+
+passport.use( new JwtStrategy(opts, (jwtPayload, done) => {
+  console.log(jwtPayload);
+  SqlService.getUser(jwtPayload.email, (err, results) => {
+    if (err) {
+      return done(err, false);
+    }
+
+    if (results.length) {
+      return done(null, results);
+    } else {
+      return done(null, false);
+    }
+  })
+}));
+
 require('./lib/search')(app, config.es);
-require('./lib/bundle')(app, config.es);
+require('./lib/bundle')(app, config.es, passport);
+require('./lib/user')(app);
 
 app.get('/api/version', (req, resp) => {
   resp.json({version: pkg.version});
