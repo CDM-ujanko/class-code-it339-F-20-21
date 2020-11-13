@@ -38,12 +38,12 @@ export default {
 
   mounted() {
     this.getBooks();
-    this.getBundles()
+    // this.getBundles()
   },
 
   methods: {
     getBooks() {
-      axios.get('http://localhost:4000/api/search/books', {
+      axios.get(`${this.$apiUrl}/api/search/books`, {
         params: {
           from: this.from,
           size: this.size

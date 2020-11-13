@@ -12,17 +12,19 @@ class SqlService {
       database: 'it339'
     })
 
-    this.crateBundleTable();
     this.createUsersTable();
+    this.crateBundleTable();
   }
 
   crateBundleTable() {
     this.connection.query(`CREATE TABLE IF NOT EXISTS bundles (
       id INT NOT NULL AUTO_INCREMENT,
+      user VARCHAR(255) NOT NULL,
       name VARCHAR(100) NOT NULL,
       description VARCHAR(255) NOT NULL,
       books VARCHAR(255),
-      PRIMARY KEY (id)
+      PRIMARY KEY (id),
+      FOREIGN KEY (user) REFERENCES users(email)
     )`, (error, results, filed) => {
       // console.log(error, results, filed)
     });
@@ -31,18 +33,29 @@ class SqlService {
   createUsersTable() {
     this.connection.query(`CREATE TABLE IF NOT EXISTS users (
       id INT NOT NULL AUTO_INCREMENT,
-      email VARCHAR(255) NOT NULL UNIQUE,
+      email VARCHAR(255) NOT NULL UNIQUE, 
       firstName VARCHAR(100) NOT NULL,
       lastName VARCHAR(100) NOT NULL,
       password VARCHAR(255) NOT NULL,
       PRIMARY KEY (id)
     )`, (error, results, filed) => {
       // console.log(error, results, filed)
+      let user = {
+        firstName: 'Bob',
+        lastName: 'Belcher',
+        email: 'bob@aol.com',
+        password: 'password',
+      }
+        this.createUser(user, (err) => {
+          if (err) {
+            console.log(err);
+          }
+        })
     });
   }
 
-  getBundles(callback) {
-   this.connection.query(`SELECT * FROM bundles`, callback);
+  getBundles(email, callback) {
+   this.connection.query(`SELECT * FROM bundles WHERE user = ?`, [email], callback);
   }
 
   getBundle(id, callback) {
@@ -61,7 +74,7 @@ class SqlService {
         throw err;
       }
       user.password = hash;
-      this.connection.query(`INSERT INTO users SET ?`, user, callback);
+      this.connection.query(`INSERT IGNORE INTO users SET ?`, user, callback);
     });
   }
 

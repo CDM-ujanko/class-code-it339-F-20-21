@@ -50,7 +50,7 @@ module.exports = app => {
 
       let token = jwt.sign(body, process.env.JWT_SECRET);
 
-      return resp.json({ token, user: body });
+      return resp.json({user: {token, ...body}});
     });
   });
 }

@@ -12,7 +12,8 @@ const config = {
   port: process.env.SERVER_PORT,
   es: {
     host: process.env.ES_HOST,
-    port: process.env.ES_PORT
+    port: process.env.ES_PORT,
+    key: process.env.ES_API_KEY
   }
 }
 
@@ -20,7 +21,7 @@ const app = express();
 
 app.use(function (req, res, next) {
   // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
+  res.setHeader('Access-Control-Allow-Origin', 'http://classexample.com');
 
   // Request methods you wish to allow
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
@@ -54,7 +55,15 @@ passport.use( new JwtStrategy(opts, (jwtPayload, done) => {
     }
 
     if (results.length) {
-      return done(null, results);
+
+      let user = {
+        _id: results[0].id,
+        firstName: results[0].firstName,
+        lastName: results[0].lastName,
+        email: results[0].email,
+      };
+
+      return done(null, user);
     } else {
       return done(null, false);
     }

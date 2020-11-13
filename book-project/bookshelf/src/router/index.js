@@ -25,6 +25,10 @@ const routes = [
     path: '/bundle/:id',
     name: 'Bundle',
     component: () => import(/* webpackChunkName: "bundle" */ '../views/EditBundle.vue')
+  }, {
+    path: '/login',
+    name: 'Login',
+    component: () => import(/* webpackChunkName: "bundle" */ '../views/Login.vue')
   }
 ]
 
